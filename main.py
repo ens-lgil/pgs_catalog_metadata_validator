@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 import io
+import os
 from validator.main_validator import PGSMetadataValidator
 
 app = Flask(__name__)
@@ -11,6 +12,19 @@ app.config['MAX_CONTENT_LENGTH'] = 4 * 1000 * 1000
 # CORS settings
 CORS(app)
 cors = CORS(app, resources={r"/": {"origins": "*"}})
+
+
+if not os.getenv('GAE_APPLICATION', None):
+    app_settings = os.path.join('./', 'app.yaml')
+    if os.path.exists(app_settings):
+        import yaml
+        with open(app_settings) as secrets_file:
+            secrets = yaml.load(secrets_file, Loader=yaml.FullLoader)
+            for keyword in secrets['env_variables']:
+                os.environ[keyword] = secrets['env_variables'][keyword]
+    else:
+        print("Error: missing app.yaml file")
+        exit(1)
 
 
 @app.route("/robots.txt")
