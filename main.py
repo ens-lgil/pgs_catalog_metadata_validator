@@ -46,19 +46,21 @@ def validate_metadata():
     metadata_validator.post_parsing_checks()
 
     valid = True
-    depositon_report = {}
+    public_error_report = {}
+    public_warning_report = {}
     if metadata_validator.report['error']:
         valid = False
         error_report = metadata_validator.report['error']
-        add_report_error(depositon_report, error_report)
+        add_report_error(public_error_report, error_report)
 
     if metadata_validator.report['warning']:
         warning_report = metadata_validator.report['warning']
-        add_report_error(depositon_report, warning_report)
+        add_report_error(public_warning_report, warning_report)
 
     response = {
         "valid": valid,
-        "errorMessages": depositon_report
+        "errorMessages": public_error_report,
+        "warningMessages": public_warning_report
     }
 
     return jsonify(response)
